@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-exchange-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: second-exchange-service
+  template:
+    metadata:
+      labels:
+        app: second-exchange-service
+    spec:
+      containers:
+        - name: app
+          image: cdchandani/second-exchange-service
+          ports:
+            - containerPort: 8082
+          env:
+            - name: MONGO_URL
+              value: postgresql://postgres-container:5433/futuresdb
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: second-exchange-service
+spec:
+  selector:
+    app: second-exchange-service
+  ports:
+    - port: 80
+      targetPort: 8082
+  type: LoadBalancer
